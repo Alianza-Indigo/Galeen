@@ -1,7 +1,6 @@
--- GALEEN multi-tenant foundation (not yet applied)
--- Only run against the intended new Neon database with a migration role.
+-- GALEEN multi-tenant foundation (repository-controlled migration)
+-- Applied to GALEEN production Neon by the repository migration runner.
 -- Application sessions must verify tenant membership before setting galeen.tenant_id.
-BEGIN;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TABLE organizations (
@@ -177,4 +176,3 @@ CREATE POLICY scoped_audit ON audit_events
   USING (organization_id::text = current_setting('galeen.tenant_id',true))
   WITH CHECK (organization_id::text = current_setting('galeen.tenant_id',true));
 
-COMMIT;

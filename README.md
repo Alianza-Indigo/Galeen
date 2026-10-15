@@ -5,7 +5,7 @@ GALEEN is a BYO multi-institutional AI administration SaaS, built with Next.js f
 ## Current status
 
 - A live configuration dashboard and GET /api/health endpoint.
-- A PostgreSQL migration under db/migrations/001_initial.sql for an intended Neon instance. The migration has NOT been applied.
+- A PostgreSQL migration under db/migrations/001_initial.sql for an intended Neon instance. The migration runs automatically during successful Vercel production builds; inspect the deployment logs to confirm it applied.
 - No live provider accounts, no working authentication, no provisioning, no billing, and no active inference gateway yet.
 
 All statistics in the initial dashboard explicitly show zero real activity. Administrative writes are not exposed before authentication and tenant authorization are implemented.

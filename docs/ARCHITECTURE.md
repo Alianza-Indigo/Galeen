@@ -42,3 +42,7 @@ La consola Next.js está desplegada. Este repositorio incluye un esquema de base
 6. Agregar adaptadores de inferencia, cuota transaccional, facturación y administración real.
 
 Nota: la presencia de una variable de entorno no demuestra conectividad. Es necesaria una comprobación real de DB, migraciones y control de acceso.
+
+## Database migrations
+
+Migrations are applied by the repository runner on production builds, after Next.js compiles. See db/README.md. This runner is transaction-safe, serialized, versioned and fails closed on errors.
