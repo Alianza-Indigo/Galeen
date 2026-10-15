@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
         const canManage = ["owner","admin","manager","auditor"].includes(role);
         const resources = await client.query(
           "SELECT a.id,a.provider,a.label,a.account_alias,a.max_assignees,a.max_concurrent,"+
-          "a.lease_minutes,a.status,a.connection_status,a.created_at,"+
+          "a.lease_minutes,a.status,a.connection_status,a.pool_key_hint,a.pool_model,a.pool_verified_at,a.created_at,"+
           "(SELECT count(*)::int FROM shared_account_members m WHERE m.organization_id=a.organization_id "+
           "AND m.resource_id=a.id AND m.status='active') AS assignee_count,"+
           "(SELECT count(*)::int FROM shared_account_reservations r WHERE r.organization_id=a.organization_id "+

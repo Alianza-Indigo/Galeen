@@ -2,11 +2,14 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import "./shared-accounts.css";
+import "./pool-broker.css";
+import PoolBrokerPanel from "./PoolBrokerPanel";
 
 type Resource={
   id:string;provider:string;label:string;account_alias:string;
   max_assignees:number;max_concurrent:number;lease_minutes:number;
   status:"active"|"paused"|"retired";connection_status:string;
+  pool_key_hint:string|null;pool_model:string|null;pool_verified_at:string|null;
   assignee_count:number;busy_count:number
 };
 type Member={id:string;resource_id:string;user_id:string;email:string;display_name:string|null};
@@ -135,6 +138,10 @@ export default function SharedAccountsManager({organizationId,role,userId}:Props
                   <button disabled={busy||!hasPlace} onClick={()=>void act("reserve",{resourceId:resource.id})}>Reservar turno</button></>
               :<span>Usuarios asignados pueden reservar turnos.</span>}
             </div>}
+          <PoolBrokerPanel organizationId={organizationId} resourceId={resource.id}
+            provider={resource.provider} status={resource.connection_status}
+            hint={resource.pool_key_hint} model={resource.pool_model} canManage={canManage}
+            hasTurn={Boolean(myTurn)} onChange={load}/>
           {canManage&&<div className="sa-controls">
             <button disabled={busy} onClick={()=>setEditing(editing===resource.id?"":resource.id)}>Configurar</button>
           </div>}
