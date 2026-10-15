@@ -42,7 +42,7 @@ export async function GET(req:NextRequest) {
             "FROM audit_events WHERE organization_id=$1 ORDER BY id DESC LIMIT 100",[orgId])
           :Promise.resolve({rows:[]}),
         ["owner","admin","manager","auditor"].includes(role)
-          ?client.query("SELECT id,provider,label,kind,enabled,created_at "+
+          ?client.query("SELECT id,provider,label,kind,enabled,health_status,credential_hint,last_checked_at,created_at "+
             "FROM provider_connections WHERE organization_id=$1 ORDER BY created_at DESC LIMIT 100",[orgId])
           :Promise.resolve({rows:[]})
       ]);

@@ -1,6 +1,7 @@
 "use client";
 import {useEffect,useState,type FormEvent} from "react";
 import Link from "next/link";
+import ConnectionsManager from "./ConnectionsManager";
 import "./institution.css";
 
 type Institution={
@@ -11,7 +12,7 @@ type Person={id:string;email:string;display_name:string|null};
 type Membership={user_id:string;email:string;display_name:string|null;role:string;status:string};
 type Invitation={id:string;email:string;role:string;created_at:string;expires_at:string;revoked_at:string|null;accepted_at:string|null};
 type Policy={id:string;period:string;user_id:string|null;max_requests:string;max_effective_tokens:string;max_micro_usd:string};
-type Connection={id:string;provider:string;label:string;kind:string;enabled:boolean};
+type Connection={id:string;provider:string;label:string;kind:string;enabled:boolean;health_status:string;credential_hint?:string;last_checked_at?:string};
 type Audit={id:string;action:string;entity_type:string;created_at:string};
 type Detail={
  organization:Institution;role:string;currentUserId:string;members:Membership[];invitations:Invitation[];
@@ -201,10 +202,7 @@ export default function InstitutionPortal(){
         <div className="ip-empty">No hay políticas registradas.</div>}
       </section>
      </>}
-     {section==="connections"&&<section className="ip-card"><h2>Conexiones <span>{detail.connections.length}</span></h2>
-      {detail.connections.length?detail.connections.map(c=><div className="ip-invite" key={c.id}><div><b>{c.label}</b><small>{c.provider}</small></div><span>{c.enabled?"Activa":"Inactiva"}</span></div>):
-        <div className="ip-empty">No hay conexiones registradas.</div>}
-     </section>}
+     {section==="connections"&&<ConnectionsManager organizationId={selected} allowedProviders={detail.organization.allowed_providers||[]} connections={detail.connections} canManage={mayBranding} onSaved={()=>loadDetail(selected)}/>} 
      {section==="audit"&&mayAudit&&<section className="ip-card"><h2>Auditoría</h2>
       {detail.events.length?detail.events.map(a=><div className="ip-invite" key={a.id}><div><b>{a.action}</b><small>{a.entity_type}</small></div>
         <span>{new Date(a.created_at).toLocaleDateString("es-MX")}</span></div>):
