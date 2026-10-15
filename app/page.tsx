@@ -51,7 +51,7 @@ export default function Home() {
         <header className="topbar"><button className="mobile-menu" onClick={() => setMobileMenu(!mobileMenu)} aria-label="Mostrar navegación">☰</button><span>GALEEN <span className="muted">/ {titles[tab][0]}</span></span><div style={{display:"flex",alignItems:"center",gap:12}}><span className="pill">Superadministrador</span><button type="button" onClick={signOut} style={{border:"1px solid #d8dee7",background:"white",borderRadius:8,padding:"8px 12px",fontWeight:600}}>Salir</button></div></header>
         <div className="content">
           <div className="eyebrow">CONSOLA INSTITUCIONAL / {tab.toUpperCase()}</div>
-          <h1>{titles[tab][0]}</h1><p className="lead">{titles[tab][1]}</p>
+          <h1>{titles[tab][0]}</h1><p><a href="/admin/manage" style={{display:"inline-block",marginTop:12,marginBottom:12,padding:"11px 16px",borderRadius:9,background:"#1c304b",color:"#fff",textDecoration:"none",fontWeight:700,fontSize:12}}>Administrar instituciones →</a></p><p className="lead">{titles[tab][1]}</p>
           <div className="notice"><b>Instalación inicial</b><span>La interfaz está disponible. La administración y las conexiones reales se habilitarán después de configurar Neon, autenticación y permisos.</span><button onClick={() => setTab("settings")}>Ver requisitos →</button></div>
           {tab === "overview" && <>
             <div className="stats">{[["Instituciones","0","Sin instituciones registradas"],["Usuarios activos","0","Sin usuarios registrados"],["Conexiones de IA","0","Aún sin proveedores"],["Solicitudes","0","Sin tráfico real"]].map(a => <article className="stat" key={a[0]}><small>{a[0]}</small><strong>{a[1]}</strong><span>{a[2]}</span></article>)}</div>
