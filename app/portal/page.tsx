@@ -3,6 +3,7 @@ import {useEffect,useState,type FormEvent} from "react";
 import Link from "next/link";
 import ConnectionsManager from "./ConnectionsManager";
 import SubscriptionsManager from "./SubscriptionsManager";
+import SharedAccountsManager from "./SharedAccountsManager";
 import "./institution.css";
 
 type Institution={
@@ -29,7 +30,7 @@ function field(form:FormData,name:string){return String(form.get(name)||"").trim
 export default function InstitutionPortal(){
  const [person,setPerson]=useState<Person|null>(null),[institutions,setInstitutions]=useState<Institution[]>([]);
  const [selected,setSelected]=useState(""),[detail,setDetail]=useState<Detail|null>(null);
- const [section,setSection]=useState<Section>("overview"),[connectionMode,setConnectionMode]=useState<"subscriptions"|"api">("subscriptions"),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false);
+ const [section,setSection]=useState<Section>("overview"),[connectionMode,setConnectionMode]=useState<"shared"|"subscriptions"|"api">("shared"),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false);
  const [error,setError]=useState(""),[success,setSuccess]=useState(""),[invitationLink,setInvitationLink]=useState("");
  const active=institutions.find(o=>o.id===selected);
  const actor=detail?.role||active?.role||"member";
@@ -205,12 +206,15 @@ export default function InstitutionPortal(){
      </>}
      {section==="connections"&&<div>
       <nav className="ip-resource-modes" aria-label="Tipos de conexión">
+        <button className={connectionMode==="shared"?"active":""} type="button" onClick={()=>setConnectionMode("shared")}>Cuentas compartidas</button>
         <button className={connectionMode==="subscriptions"?"active":""} type="button" onClick={()=>setConnectionMode("subscriptions")}>Cuentas y licencias</button>
         <button className={connectionMode==="api"?"active":""} type="button" onClick={()=>setConnectionMode("api")}>Conexiones API</button>
       </nav>
-      {connectionMode==="subscriptions"
-        ? <SubscriptionsManager key={selected} organizationId={selected} role={actor} onChanged={()=>{void loadDetail(selected)}}/>
-        : <ConnectionsManager organizationId={selected} allowedProviders={detail.organization.allowed_providers||[]} connections={detail.connections} canManage={mayBranding} onSaved={()=>loadDetail(selected)}/>
+      {connectionMode==="shared"
+        ? <SharedAccountsManager key={selected} organizationId={selected} role={actor} userId={detail.currentUserId}/>
+        : connectionMode==="subscriptions"
+          ? <SubscriptionsManager key={selected} organizationId={selected} role={actor} onChanged={()=>{void loadDetail(selected)}}/>
+          : <ConnectionsManager organizationId={selected} allowedProviders={detail.organization.allowed_providers||[]} connections={detail.connections} canManage={mayBranding} onSaved={()=>loadDetail(selected)}/>
       }
      </div>} 
      {section==="audit"&&mayAudit&&<section className="ip-card"><h2>Auditoría</h2>
