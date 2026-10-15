@@ -33,6 +33,7 @@ export default function Home() {
     fetch("/api/health", { cache: "no-store" })
       .then(r => r.json()).then(r => setComponents(r.components || {})).catch(() => {});
   }, []);
+  async function signOut() { await fetch("/api/admin/logout", {method: "POST"}); window.location.assign("/login"); }
   return (
     <div className="shell">
       <aside className={"sidebar" + (mobileMenu ? " sidebar-open" : "")}>
@@ -47,7 +48,7 @@ export default function Home() {
         <div className="sidebar-end"><b>BYO por diseño</b><p>La institución controla sus propias conexiones y capacidad de IA.</p></div>
       </aside>
       <main className="main">
-        <header className="topbar"><button className="mobile-menu" onClick={() => setMobileMenu(!mobileMenu)} aria-label="Mostrar navegación">☰</button><span>GALEEN <span className="muted">/ {titles[tab][0]}</span></span><span className="pill">Configuración inicial</span></header>
+        <header className="topbar"><button className="mobile-menu" onClick={() => setMobileMenu(!mobileMenu)} aria-label="Mostrar navegación">☰</button><span>GALEEN <span className="muted">/ {titles[tab][0]}</span></span><div style={{display:"flex",alignItems:"center",gap:12}}><span className="pill">Superadministrador</span><button type="button" onClick={signOut} style={{border:"1px solid #d8dee7",background:"white",borderRadius:8,padding:"8px 12px",fontWeight:600}}>Salir</button></div></header>
         <div className="content">
           <div className="eyebrow">CONSOLA INSTITUCIONAL / {tab.toUpperCase()}</div>
           <h1>{titles[tab][0]}</h1><p className="lead">{titles[tab][1]}</p>
