@@ -1,23 +1,39 @@
 # GALEEN
 
-GALEEN is a BYO multi-institutional AI administration SaaS, built with Next.js for Vercel.
+SaaS multiinstitucional para administrar el acceso de organizaciones a herramientas de inteligencia artificial, desarrollado con Next.js, Neon PostgreSQL y Vercel.
 
-## Current status
+## Dos modalidades, bajo control del cliente
 
-- A live configuration dashboard and GET /api/health endpoint.
-- A PostgreSQL migration under db/migrations/001_initial.sql for an intended Neon instance. The migration runs automatically during successful Vercel production builds; inspect the deployment logs to confirm it applied.
-- No live provider accounts, no working authentication, no provisioning, no billing, and no active inference gateway yet.
+1. **Cuentas y suscripciones**. Inventario de suscripciones institucionales, planes, número de asientos y asignación de cupos a personas de la institución. Los accesos se gestionan con el proveedor; GALEEN **no recibe contraseñas, cookies ni sesiones de las suscripciones**. Las asignaciones internas no equivalen al aprovisionamiento de cuentas externas ni crean derechos adicionales de uso.
+2. **API institucional**. La organización proporciona sus propias claves API oficiales. GALEEN las cifra en el servidor, permite probarlas, rotarlas, activarlas o desactivarlas. No se ha habilitado todavía un motor de inferencia.
 
-All statistics in the initial dashboard explicitly show zero real activity. Administrative writes are not exposed before authentication and tenant authorization are implemented.
+El cliente es responsable de contratar su capacidad con el proveedor. Compartir una suscripción personal entre múltiples usuarios no se presume permitido ni técnicamente integrado.
 
-## Architecture
+## Rutas actuales
 
-See docs/ARCHITECTURE.md. The institutional customer owns and manages authorized provider connections; GALEEN only manages platform access and later metering, policies, and billing for the SaaS itself.
+- `/`: entrada general
+- `/login`: inicio de sesión del superadministrador
+- `/admin`: consola general
+- `/admin/manage`: instituciones, usuarios, planes y cuotas
+- `/member/login`: inicio de sesión institucional
+- `/portal`: portal institucional y sus dos modalidades de recursos de IA
 
-## Local
+## Persistencia
 
-Install with npm install, then npm run dev. Set secrets in Vercel's encrypted environment management. Never commit credentials.
+Las migraciones PostgreSQL viven en `db/migrations` y las aplica `scripts/migrate.mjs` durante el build de producción. El runner registra los checksums y aborta el despliegue si una migración falla.
 
-## Deployment
+La conexión de PostgreSQL y los secretos deben gestionarse como variables cifradas de Vercel; jamás en el repositorio ni en el navegador.
 
-Connected repository: Alianza-Indigo/Galeen (main). Vercel project: galeen.
+## Límites operativos
+
+- Administración institucional, roles, invitaciones, marca blanca y auditoría están implementados en el backend.
+- Conexiones API: almacenamiento y verificación de credenciales, pero **sin procesamiento de prompts ni consumo**.
+- Suscripciones: inventario y asignaciones internas de cupos; **no aprovisionamiento automático, autenticación en el proveedor ni balanceo de suscripciones**.
+- Pendientes: pruebas end-to-end de cuentas reales y aislamiento multiinstitucional, motor de inferencia autorizado, facturación y portal de IA.
+- No se debe presentar la asignación de cupos de GALEEN como una licencia confirmada por OpenAI, Anthropic, Google o Microsoft.
+
+## Desarrollo
+
+`npm install` y `npm run dev`. Revisar `db/README.md` y `docs/ARCHITECTURE.md` para esquemas, migraciones y restricciones de seguridad.
+
+Repositorio: `Alianza-Indigo/Galeen`, rama `main`. Proyecto de Vercel: `galeen`.

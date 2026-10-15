@@ -1,0 +1,26 @@
+.ip-sub-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.ip-sub-heading h2{margin-bottom:12px}
+.ip-sub-add{border:1px solid #d4dce6;border-radius:8px;padding:9px 13px;background:white;color:#314860;font-size:12px;font-weight:700}
+.ip-sub-record{border-top:1px solid #edf0f4;padding:21px 0}
+.ip-sub-headline{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ip-sub-headline b,.ip-sub-headline small{display:block}
+.ip-sub-headline b{font-size:14px;color:#23354d}.ip-sub-headline small{font-size:12px;color:#8898ab;margin-top:5px}
+.ip-sub-status{padding:5px 11px;background:#f3f3f5;color:#7e8997;border-radius:20px;font-size:10px}
+.ip-sub-status.ip-sub-active{background:#e8f5ee;color:#418a5d}
+.ip-sub-metrics{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:#8290a1;margin:13px 0}
+.ip-sub-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;grid-column:1/-1}
+.ip-sub-actions a,.ip-sub-actions button,.ip-sub-person button,.ip-sub-assign button{display:inline-block;border:1px solid #d4dce6;border-radius:8px;padding:9px 12px;background:white;color:#405873;text-decoration:none;font-size:11px;font-weight:700;cursor:pointer}
+.ip-sub-actions .ip-primary{background:#172b44;color:#fff;border:none}
+.ip-sub-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:14px 0;padding:18px;background:#f7f9fb;border-radius:11px}
+.ip-sub-form label{display:grid;gap:7px;color:#62758c;font-size:12px;font-weight:700}
+.ip-sub-form input,.ip-sub-form select,.ip-sub-assign select{min-width:0;width:100%;border:1px solid #cbd5e1;background:white;border-radius:8px;padding:10px;color:#23344b;font-size:12px}
+.ip-sub-edit{margin-top:18px}.ip-sub-allocations{margin-top:19px;border-top:1px solid #eff1f4;padding-top:17px}
+.ip-sub-allocations>strong{font-size:12px}.ip-sub-allocations p{font-size:12px;color:#99a6b5}
+.ip-sub-person{display:flex;align-items:center;gap:15px;padding:11px 0;border-bottom:1px solid #f0f2f5}
+.ip-sub-person>div{flex:1;min-width:0}.ip-sub-person b,.ip-sub-person small{display:block;font-size:12px}
+.ip-sub-person small{color:#94a2b2;font-size:11px;margin-top:4px}
+.ip-sub-assign{display:flex;gap:9px;align-items:center;margin-top:16px}.ip-sub-assign select{flex:1}
+.ip-sub-assign button{white-space:nowrap}.ip-sub-owner{color:#8294a6;font-size:11px}
+@media(max-width:600px){.ip-sub-form{grid-template-columns:1fr}.ip-sub-assign{flex-wrap:wrap}.ip-sub-assign select{flex-basis:100%}}
+
+.ip-sub-caption{font-size:11px;color:#8897a9;margin:-1px 0 20px;line-height:1.6}

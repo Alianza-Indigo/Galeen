@@ -2,6 +2,7 @@
 import {useEffect,useState,type FormEvent} from "react";
 import Link from "next/link";
 import ConnectionsManager from "./ConnectionsManager";
+import SubscriptionsManager from "./SubscriptionsManager";
 import "./institution.css";
 
 type Institution={
@@ -28,7 +29,7 @@ function field(form:FormData,name:string){return String(form.get(name)||"").trim
 export default function InstitutionPortal(){
  const [person,setPerson]=useState<Person|null>(null),[institutions,setInstitutions]=useState<Institution[]>([]);
  const [selected,setSelected]=useState(""),[detail,setDetail]=useState<Detail|null>(null);
- const [section,setSection]=useState<Section>("overview"),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false);
+ const [section,setSection]=useState<Section>("overview"),[connectionMode,setConnectionMode]=useState<"subscriptions"|"api">("subscriptions"),[loading,setLoading]=useState(true),[saving,setSaving]=useState(false);
  const [error,setError]=useState(""),[success,setSuccess]=useState(""),[invitationLink,setInvitationLink]=useState("");
  const active=institutions.find(o=>o.id===selected);
  const actor=detail?.role||active?.role||"member";
@@ -92,7 +93,7 @@ export default function InstitutionPortal(){
       ["members","♙","Usuarios"],
       ["branding","◫","Identidad visual"],
       ["quotas","▤","Cuotas"],
-      ["connections","◇","Conexiones"],
+      ["connections","◇","Recursos de IA"],
       ["audit","▥","Auditoría"]
     ] as const).filter(([id])=>id==="overview"||id==="connections"||(id==="members"&&mayMembers)||
     (id==="branding"&&mayBranding)||(id==="quotas"&&["owner","admin","manager","auditor"].includes(actor))||
@@ -103,7 +104,7 @@ export default function InstitutionPortal(){
     <div><b>{person?.display_name||person?.email||"Mi cuenta"}</b><small>{person?.email}</small></div></div>
   </aside>
   <main className="ip-main">
-   <header className="ip-top"><span>{active?.name||"Institución"} <b>/ {section==="overview"?"Resumen":section==="members"?"Usuarios":section==="branding"?"Identidad visual":section==="quotas"?"Cuotas":section==="connections"?"Conexiones":"Auditoría"}</b></span>
+   <header className="ip-top"><span>{active?.name||"Institución"} <b>/ {section==="overview"?"Resumen":section==="members"?"Usuarios":section==="branding"?"Identidad visual":section==="quotas"?"Cuotas":section==="connections"?"Recursos de IA":"Auditoría"}</b></span>
      <div><button onClick={()=>selected&&loadDetail(selected)} disabled={loading}>Actualizar</button><button onClick={signOut}>Salir</button></div>
    </header>
    <div className="ip-content">
@@ -130,7 +131,7 @@ export default function InstitutionPortal(){
          {mayMembers&&<button className="ip-feature" onClick={()=>setSection("members")}><span>♙</span><div><b>Administrar usuarios</b><small>Miembros, invitaciones y permisos</small></div>↗</button>}
          {mayBranding&&<button className="ip-feature" onClick={()=>setSection("branding")}><span>◫</span><div><b>Identidad institucional</b><small>Nombre, imagen y colores</small></div>↗</button>}
          {["owner","admin","manager"].includes(actor)&&<button className="ip-feature" onClick={()=>setSection("quotas")}><span>▤</span><div><b>Administrar cuotas</b><small>Políticas institucionales y por usuario</small></div>↗</button>}
-         <button className="ip-feature" onClick={()=>setSection("connections")}><span>◇</span><div><b>Conexiones de IA</b><small>Servicios de tu institución</small></div>↗</button>
+         <button className="ip-feature" onClick={()=>setSection("connections")}><span>◇</span><div><b>Recursos de IA</b><small>Servicios de tu institución</small></div>↗</button>
         </section>
         <section className="ip-card"><h2>Plan institucional</h2>
           <div className="ip-plan-detail"><span>Usuarios permitidos</span><b>{detail.organization.max_users}</b></div>
@@ -202,7 +203,16 @@ export default function InstitutionPortal(){
         <div className="ip-empty">No hay políticas registradas.</div>}
       </section>
      </>}
-     {section==="connections"&&<ConnectionsManager organizationId={selected} allowedProviders={detail.organization.allowed_providers||[]} connections={detail.connections} canManage={mayBranding} onSaved={()=>loadDetail(selected)}/>} 
+     {section==="connections"&&<div>
+      <nav className="ip-resource-modes" aria-label="Tipos de conexión">
+        <button className={connectionMode==="subscriptions"?"active":""} type="button" onClick={()=>setConnectionMode("subscriptions")}>Cuentas y licencias</button>
+        <button className={connectionMode==="api"?"active":""} type="button" onClick={()=>setConnectionMode("api")}>Conexiones API</button>
+      </nav>
+      {connectionMode==="subscriptions"
+        ? <SubscriptionsManager key={selected} organizationId={selected} role={actor} onChanged={()=>{void loadDetail(selected)}}/>
+        : <ConnectionsManager organizationId={selected} allowedProviders={detail.organization.allowed_providers||[]} connections={detail.connections} canManage={mayBranding} onSaved={()=>loadDetail(selected)}/>
+      }
+     </div>} 
      {section==="audit"&&mayAudit&&<section className="ip-card"><h2>Auditoría</h2>
       {detail.events.length?detail.events.map(a=><div className="ip-invite" key={a.id}><div><b>{a.action}</b><small>{a.entity_type}</small></div>
         <span>{new Date(a.created_at).toLocaleDateString("es-MX")}</span></div>):

@@ -31,3 +31,8 @@
 @media(max-width:1100px){.ip-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.ip-grid{grid-template-columns:1fr}}
 @media(max-width:850px){.ip-shell{grid-template-columns:1fr}.ip-sidebar{min-height:0;padding:18px}.ip-logo{padding:0}.ip-workspace{margin:16px 0}.ip-sidebar nav{display:flex;overflow-x:auto}.ip-sidebar nav button{white-space:nowrap}.ip-profile{display:none}.ip-content{padding:25px 17px}.ip-top{padding:0 18px}.ip-member{flex-wrap:wrap}.ip-stats{gap:10px}}
 @media(max-width:480px){.ip-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.ip-stats article{padding:15px}.ip-form{grid-template-columns:1fr}.ip-heading h1{font-size:24px}.ip-plan{font-size:10px}.ip-top{height:60px}}
+
+/* API and institution-owned subscription access are separate modes. */
+.ip-resource-modes{display:flex;align-items:center;gap:8px;margin-bottom:20px;padding:5px;background:#eaf0f6;border-radius:11px;width:max-content;max-width:100%;overflow:auto}
+.ip-resource-modes button{border:0;background:transparent;padding:11px 17px;border-radius:8px;color:#6b7e94;font-weight:750;font-size:12px;white-space:nowrap;cursor:pointer}
+.ip-resource-modes button.active{background:white;color:#1c314c;box-shadow:0 2px 7px #192f4312}
