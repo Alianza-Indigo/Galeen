@@ -64,6 +64,6 @@ export function canSetMemberRole(actor: InstitutionRole, nextRole: InstitutionRo
 export function canChangeCurrentMember(actor: InstitutionRole, currentRole: InstitutionRole) {
   if (currentRole==="owner") return false;
   if (actor==="owner") return true;
-  if (actor==="admin") return currentRole!=="owner" && currentRole!=="admin";
+  if (actor==="admin") return currentRole!=="admin";
   return actor==="manager" && ["member","auditor"].includes(currentRole);
 }
