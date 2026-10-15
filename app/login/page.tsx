@@ -35,7 +35,7 @@ export default function Login() {
   return <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 20, background: "#f5f7fb" }}>
     <form onSubmit={submit} style={{ width: "100%", maxWidth: 410, padding: 36, background: "#fff", borderRadius: 18, border: "1px solid #e3e9f1", boxShadow: "0 14px 50px #101c3014" }}>
       <h1 style={{ fontSize: 36, marginTop: 0 }}>galeen<span style={{ color: "#bc8b4e" }}>.</span></h1>
-      <p style={{ color: "#758398", fontSize: 14 }}>Consola privada · Superadministrador</p>
+      <p style={{ color: "#758398", fontSize: 14 }}>Acceso a GALEEN</p>
       <label htmlFor="admin-user" style={{ display: "block", marginTop: 25, marginBottom: 8, fontSize: 13 }}>Usuario</label>
       <input id="admin-user" value={username} onChange={e => setUsername(e.target.value)}
         autoComplete="username" maxLength={128} required

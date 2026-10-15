@@ -12,6 +12,6 @@ return <main style={{minHeight:"100vh",background:"#f7f8fb",color:"#1a2d44",padd
 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:18}}>
 {profile?.institutions.map(o=><article key={o.id} style={{background:"white",border:"1px solid #e5eaf0",borderTop:"4px solid "+(o.branding?.primaryColor||"#b69363"),padding:25,borderRadius:12}}>
 <h2>{o.branding?.shortName||o.name}</h2><p>Rol: {o.role}</p><p>Plan: {o.plan_code}</p><p>Máximo de usuarios: {o.max_users}</p><p>Solicitudes mensuales: {o.max_monthly_requests}</p><p>Proveedores permitidos: {o.allowed_providers?.join(", ")||"Ninguno"}</p>
-<p style={{fontSize:12,color:"#7c8b9c"}}>Las conexiones de IA todavía no están habilitadas.</p></article>)}
+</article>)}
 </div>{profile?.institutions.length===0&&<p>No tienes membresías activas.</p>}</section></main>
 }

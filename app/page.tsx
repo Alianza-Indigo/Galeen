@@ -1,72 +1,189 @@
 "use client";
 import { useEffect, useState } from "react";
 
-const sections = [
+const tabs = [
   { id: "overview", label: "Resumen", symbol: "◈" },
   { id: "institutions", label: "Instituciones", symbol: "▦" },
-  { id: "connections", label: "Proveedores de IA", symbol: "◇" },
-  { id: "people", label: "Usuarios y roles", symbol: "♙" },
-  { id: "usage", label: "Consumo y cuotas", symbol: "▤" },
+  { id: "connections", label: "Conexiones", symbol: "◇" },
+  { id: "people", label: "Usuarios", symbol: "♙" },
+  { id: "usage", label: "Consumo", symbol: "▤" },
   { id: "settings", label: "Configuración", symbol: "⚙" }
 ] as const;
-type Tab = typeof sections[number]["id"];
-const titles: Record<Tab, [string, string]> = {
-  overview: ["Centro de control", "Una plataforma para administrar la inteligencia artificial de todas tus instituciones."],
-  institutions: ["Instituciones", "Espacios independientes con sus propios administradores y recursos."],
-  connections: ["Proveedores de IA", "Cada institución conectará sus propias credenciales autorizadas."],
-  people: ["Usuarios y roles", "Control institucional de accesos y permisos."],
-  usage: ["Consumo y cuotas", "Presupuestos y métricas de uso por institución."],
-  settings: ["Configuración", "Estado de la infraestructura y requisitos de activación."]
+type Tab = (typeof tabs)[number]["id"];
+type Organization = {
+  id: string; name: string; slug: string; status: string;
+  plan_code: string | null; active_users: number; active_connections: number;
 };
-const features = [
-  ["▦", "Multiinstitución", "Usuarios y datos aislados por organización."],
-  ["◇", "Conexiones BYO", "Conexiones oficiales bajo control de cada cliente."],
-  ["▤", "Cuotas y consumo", "Medición y presupuestos institucionales."],
-  ["✧", "Marca blanca", "Personalización para escuelas y organizaciones."]
-];
-type Components = Record<string,string>;
+type Stats = { total_users: number; active_orgs: number; requests: number };
+type Dashboard = { organizations: Organization[]; stats: Stats | null };
+
+const titles: Record<Tab, string> = {
+  overview: "Centro de control",
+  institutions: "Instituciones",
+  connections: "Conexiones",
+  people: "Usuarios",
+  usage: "Consumo",
+  settings: "Configuración"
+};
+const statusNames: Record<string,string> = {
+  active: "Activa", suspended: "Suspendida", closed: "Cerrada"
+};
+function EmptyState({ title, description }: { title: string; description: string }) {
+  return <div className="home-empty"><span className="home-empty-icon">◇</span>
+    <h3>{title}</h3><p>{description}</p></div>;
+}
+function OrganizationList({ organizations }: { organizations: Organization[] }) {
+  if (!organizations.length) return <EmptyState title="Sin instituciones" description="Crea tu primera institución para comenzar."/>;
+  return <div className="home-org-list">{organizations.map(org =>
+    <div className="home-org-item" key={org.id}>
+      <div className="home-org-avatar">{org.name.trim().charAt(0).toUpperCase()}</div>
+      <div className="home-org-details"><strong>{org.name}</strong><span>{org.slug} · {org.plan_code ?? "Sin plan"}</span></div>
+      <span className={"home-status home-status-"+org.status}>{statusNames[org.status] ?? org.status}</span>
+      <a href="/admin/manage" aria-label={"Administrar "+org.name} className="home-arrow">↗</a>
+    </div>
+  )}</div>;
+}
 export default function Home() {
   const [tab, setTab] = useState<Tab>("overview");
   const [mobileMenu, setMobileMenu] = useState(false);
-  const [components, setComponents] = useState<Components>({});
-  useEffect(() => {
-    fetch("/api/health", { cache: "no-store" })
-      .then(r => r.json()).then(r => setComponents(r.components || {})).catch(() => {});
-  }, []);
-  async function signOut() { await fetch("/api/admin/logout", {method: "POST"}); window.location.assign("/login"); }
-  return (
-    <div className="shell">
-      <aside className={"sidebar" + (mobileMenu ? " sidebar-open" : "")}>
-        <div className="brand"><span className="brand-symbol">✣</span><div><strong>galeen<span className="accent">.</span></strong><small>AI INFRASTRUCTURE</small></div></div>
-        <div className="workspace"><span className="workspace-avatar">G</span><div><b>GALEEN</b><small>Consola institucional</small></div></div>
-        <p className="nav-heading">PLATAFORMA</p>
-        <nav aria-label="Módulos de GALEEN">
-          {sections.map(s => <button type="button" key={s.id} className={"nav-link " + (tab === s.id ? "active" : "")} onClick={() => { setTab(s.id); setMobileMenu(false); }}>
-            <span>{s.symbol}</span>{s.label}
-          </button>)}
-        </nav>
-        <div className="sidebar-end"><b>BYO por diseño</b><p>La institución controla sus propias conexiones y capacidad de IA.</p></div>
-      </aside>
-      <main className="main">
-        <header className="topbar"><button className="mobile-menu" onClick={() => setMobileMenu(!mobileMenu)} aria-label="Mostrar navegación">☰</button><span>GALEEN <span className="muted">/ {titles[tab][0]}</span></span><div style={{display:"flex",alignItems:"center",gap:12}}><span className="pill">Superadministrador</span><button type="button" onClick={signOut} style={{border:"1px solid #d8dee7",background:"white",borderRadius:8,padding:"8px 12px",fontWeight:600}}>Salir</button></div></header>
-        <div className="content">
-          <div className="eyebrow">CONSOLA INSTITUCIONAL / {tab.toUpperCase()}</div>
-          <h1>{titles[tab][0]}</h1><p><a href="/admin/manage" style={{display:"inline-block",marginTop:12,marginBottom:12,padding:"11px 16px",borderRadius:9,background:"#1c304b",color:"#fff",textDecoration:"none",fontWeight:700,fontSize:12}}>Administrar instituciones →</a></p><p className="lead">{titles[tab][1]}</p>
-          <div className="notice"><b>Instalación inicial</b><span>La interfaz está disponible. La administración y las conexiones reales se habilitarán después de configurar Neon, autenticación y permisos.</span><button onClick={() => setTab("settings")}>Ver requisitos →</button></div>
-          {tab === "overview" && <>
-            <div className="stats">{[["Instituciones","0","Sin instituciones registradas"],["Usuarios activos","0","Sin usuarios registrados"],["Conexiones de IA","0","Aún sin proveedores"],["Solicitudes","0","Sin tráfico real"]].map(a => <article className="stat" key={a[0]}><small>{a[0]}</small><strong>{a[1]}</strong><span>{a[2]}</span></article>)}</div>
-            <div className="section-heading"><h2>Una consola. Todas tus organizaciones.</h2><p>Infraestructura multiinstitucional, escalable y de marca blanca.</p></div>
-            <div className="features">{features.map(f => <article className="feature" key={f[1]}><div className="feature-symbol">{f[0]}</div><h3>{f[1]}</h3><p>{f[2]}</p></article>)}</div>
-            <div className="two-panels"><section className="panel"><h3>Actividad reciente</h3><div className="empty"><span>◎</span><h3>Esperando primeras conexiones</h3><p>Aquí aparecerán los eventos reales de la plataforma.</p></div></section><section className="panel"><h3>Preparación de GALEEN</h3><div className="progress"><div /></div>{["Proyecto en Vercel creado","Conectar base de datos Neon","Activar autenticación","Conectar proveedores autorizados","Verificar cuotas y facturación"].map((s,i)=><p className="task" key={s}><span>{i===0?"✓":"○"}</span>{s}</p>)}</section></div>
-          </>}
-          {tab === "institutions" && <section className="panel"><h3>Directorio institucional</h3><div className="empty"><span>▦</span><h3>Todavía no hay instituciones</h3><p>El alta estará disponible cuando la persistencia y los controles de acceso estén habilitados.</p></div></section>}
-          {tab === "connections" && <><div className="providers">{["OpenAI","Anthropic","Google Gemini","OpenRouter"].map(n=><article className="provider" key={n}><span>{n.slice(0,1)}</span><b>{n}</b><small>Sin conectar</small></article>)}</div><section className="panel"><h3>Cuentas administradas por cada institución</h3><p className="lead">GALEEN gestiona las conexiones técnicas, pero las claves y servicios autorizados pertenecen a los clientes.</p></section></>}
-          {tab === "people" && <section className="panel"><h3>Usuarios y permisos</h3><div className="empty"><span>♙</span><h3>Sin usuarios registrados</h3><p>Se contemplan superadministrador, propietario institucional, administrador, gestor y usuarios finales.</p></div></section>}
-          {tab === "usage" && <section className="panel"><h3>Consumo real</h3><div className="empty"><span>▤</span><h3>Aún no hay mediciones</h3><p>Los informes registrarán exclusivamente solicitudes reales procesadas.</p></div></section>}
-          {tab === "settings" && <section className="panel"><h3>Estado de integraciones</h3>{[["frontend","Aplicación Next.js"],["tenantDatabase","Neon PostgreSQL"],["sessionSigning","Firma de sesiones"],["providerVault","Bóveda de credenciales"],["billing","Facturación Stripe"]].map(([k,n])=><div className="config-row" key={k}><span className={components[k]==="ready"||components[k]==="configured"?"ready-dot":"pending-dot"} /><div><strong>{n}</strong><small>{components[k]==="ready"?"Preparado":components[k]==="configured"?"Variable configurada; integración por verificar":"Pendiente"}</small></div></div>)}<p className="lead">Los indicadores solo muestran variables presentes; no sustituyen las pruebas de integración ni de seguridad.</p></section>}
+  const [dashboard, setDashboard] = useState<Dashboard | null>(null);
+  const [loadError, setLoadError] = useState("");
+  const [busy, setBusy] = useState(true);
+
+  async function loadDashboard() {
+    setBusy(true);
+    setLoadError("");
+    try {
+      const response = await fetch("/api/admin/data", { cache: "no-store" });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error ?? "No fue posible cargar los datos.");
+      setDashboard({ organizations: result.organizations ?? [], stats: result.stats ?? null });
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : "No fue posible cargar los datos.");
+    } finally { setBusy(false); }
+  }
+  useEffect(() => { void loadDashboard(); }, []);
+  async function signOut() {
+    await fetch("/api/admin/logout", { method: "POST" });
+    window.location.assign("/login");
+  }
+  const organizations = dashboard?.organizations ?? [];
+  const stats = dashboard?.stats;
+  const connections = organizations.reduce((sum, org) => sum + Number(org.active_connections || 0), 0);
+  const count = (value: number | undefined) => !dashboard ? "—" : (value ?? 0).toLocaleString("es-MX");
+
+  return <div className="shell">
+    <aside className={"sidebar"+(mobileMenu ? " sidebar-open" : "")}>
+      <div className="brand"><span className="brand-symbol">✣</span><div>
+        <strong>galeen<span className="accent">.</span></strong><small>CONSOLA</small>
+      </div></div>
+      <div className="workspace"><span className="workspace-avatar">G</span><div>
+        <b>GALEEN</b><small>Administración general</small>
+      </div></div>
+      <p className="nav-heading">MENÚ PRINCIPAL</p>
+      <nav aria-label="Navegación">
+        {tabs.map(item => <button type="button" key={item.id}
+          className={"nav-link"+(tab === item.id ? " active" : "")}
+          onClick={() => {setTab(item.id);setMobileMenu(false);}}>
+          <span>{item.symbol}</span>{item.label}
+        </button>)}
+      </nav>
+      <div className="home-sidebar-bottom"><span className="home-avatar">SA</span>
+        <span><strong>Superadministrador</strong><small>Cuenta principal</small></span>
+      </div>
+    </aside>
+    {mobileMenu && <button className="home-overlay" aria-label="Cerrar menú" onClick={() => setMobileMenu(false)} />}
+    <main className="main">
+      <header className="topbar">
+        <button type="button" className="mobile-menu" onClick={() => setMobileMenu(!mobileMenu)} aria-label="Abrir menú">☰</button>
+        <div className="home-breadcrumb">GALEEN <span>/</span> {titles[tab]}</div>
+        <div className="home-top-actions">
+          <a href="/admin/manage" className="home-manage-link">Administrar</a>
+          <button type="button" className="home-signout" onClick={signOut}>Salir</button>
         </div>
-        <footer>GALEEN · Inteligencia conectada · Infraestructura BYO</footer>
-      </main>
-    </div>
-  );
+      </header>
+      <div className="content">
+        <div className="eyebrow">ADMINISTRACIÓN GENERAL</div>
+        <div className="home-heading">
+          <div><h1>{titles[tab]}</h1><p>{tab === "overview" ? "Información de tu plataforma en un solo lugar." :
+            tab === "institutions" ? "Organizaciones y espacios de trabajo." :
+            tab === "connections" ? "Recursos conectados por institución." :
+            tab === "people" ? "Miembros de la plataforma." :
+            tab === "usage" ? "Actividad y límites de consumo." : "Gestión de tu cuenta y accesos."}</p></div>
+          <button type="button" onClick={() => void loadDashboard()} disabled={busy} className="home-refresh">↻ Actualizar</button>
+        </div>
+        {loadError && <div className="home-error" role="alert">{loadError}</div>}
+
+        {tab === "overview" && <>
+          <div className="stats">
+            {[
+              ["Instituciones", count(organizations.length)],
+              ["Usuarios", count(stats?.total_users)],
+              ["Conexiones", count(connections)],
+              ["Solicitudes", count(stats?.requests)]
+            ].map(([label, value]) => <article className="stat" key={label}>
+              <small>{label}</small><strong>{value}</strong>
+            </article>)}
+          </div>
+          <div className="home-overview-grid">
+            <section className="panel">
+              <div className="home-panel-heading"><h2>Instituciones</h2><a href="/admin/manage">Ver todas ↗</a></div>
+              <OrganizationList organizations={organizations.slice(0,6)} />
+            </section>
+            <section className="panel">
+              <div className="home-panel-heading"><h2>Accesos rápidos</h2></div>
+              <a className="home-action-item" href="/admin/manage"><span>▦</span>
+                <div><strong>Administrar instituciones</strong><small>Altas, usuarios, planes y permisos</small></div><b>↗</b></a>
+              <a className="home-action-item" href="/member/login"><span>♙</span>
+                <div><strong>Portal institucional</strong><small>Acceso de miembros</small></div><b>↗</b></a>
+            </section>
+          </div>
+        </>}
+
+        {tab === "institutions" && <section className="panel">
+          <div className="home-panel-heading"><h2>Directorio</h2><a href="/admin/manage">Administrar ↗</a></div>
+          <OrganizationList organizations={organizations}/>
+        </section>}
+
+        {tab === "connections" && <section className="panel">
+          <div className="home-panel-heading"><h2>Conexiones por institución</h2>
+            <span className="home-count">{count(connections)} registradas</span></div>
+          {organizations.length ? organizations.map(org => <div className="home-org-item" key={org.id}>
+            <div className="home-org-avatar">◇</div><div className="home-org-details"><strong>{org.name}</strong><span>{org.slug}</span></div>
+            <span className="home-count">{org.active_connections} activas</span>
+          </div>) : <EmptyState title="Sin conexiones" description="Las conexiones aparecerán aquí al registrarse."/>}
+        </section>}
+
+        {tab === "people" && <section className="panel">
+          <div className="home-panel-heading"><h2>Usuarios por institución</h2>
+            <span className="home-count">{count(stats?.total_users)} usuarios</span></div>
+          {organizations.length ? organizations.map(org => <div className="home-org-item" key={org.id}>
+            <div className="home-org-avatar">♙</div><div className="home-org-details"><strong>{org.name}</strong><span>{org.slug}</span></div>
+            <span className="home-count">{org.active_users} activos</span>
+            <a href="/admin/manage" className="home-arrow">↗</a>
+          </div>) : <EmptyState title="Sin usuarios" description="Los miembros aparecerán al aceptar una invitación."/>}
+        </section>}
+
+        {tab === "usage" && <div className="home-usage-layout">
+          <section className="panel"><h2>Solicitudes registradas</h2><div className="home-large-number">{count(stats?.requests)}</div></section>
+          <section className="panel"><div className="home-panel-heading"><h2>Límites y presupuestos</h2>
+            <a href="/admin/manage">Administrar ↗</a></div>
+            {organizations.length ? organizations.map(org => <div className="home-org-item" key={org.id}>
+              <div className="home-org-avatar">▤</div><div className="home-org-details"><strong>{org.name}</strong><span>{org.plan_code ?? "Sin plan"}</span></div>
+            </div>) : <EmptyState title="Sin instituciones" description="Los planes aparecerán cuando registres una institución."/>}
+          </section>
+        </div>}
+
+        {tab === "settings" && <section className="panel">
+          <div className="home-panel-heading"><h2>Cuenta y accesos</h2></div>
+          <div className="home-account-row"><span className="home-avatar">SA</span>
+            <div><strong>Superadministrador</strong><small>Control general de GALEEN</small></div>
+          </div>
+          <a className="home-action-item" href="/admin/manage"><span>▦</span>
+            <div><strong>Gestión institucional</strong><small>Instituciones, usuarios y planes</small></div><b>↗</b></a>
+        </section>}
+      </div>
+      <footer>GALEEN · Plataforma institucional</footer>
+    </main>
+  </div>;
 }
