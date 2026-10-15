@@ -1,25 +1,23 @@
 # GALEEN
 
-Plataforma SaaS multiinstitucional BYO para la administraci贸n de capacidad de IA de escuelas, universidades, empresas y organizaciones.
+GALEEN is a BYO multi-institutional AI administration SaaS, built with Next.js for Vercel.
 
-## Estado de esta entrega
+## Current status
 
-El panel Next.js y el endpoint GET /api/health est谩n desplegables. Se presentan exclusivamente valores reales de arranque (cero instituciones, cero usuarios, cero conexiones); ninguna acci贸n de administraci贸n simula persistencia.
+- A live configuration dashboard and GET /api/health endpoint.
+- A PostgreSQL migration under db/migrations/001_initial.sql for an intended Neon instance. The migration has NOT been applied.
+- No live provider accounts, no working authentication, no provisioning, no billing, and no active inference gateway yet.
 
-**NO es un SaaS listo para producci贸n ni un servicio de inferencia habilitado.** A煤n no existen base de datos vinculada, control de acceso operativo, cifrado de secretos, motor de despacho, pasarela de pagos ni aislamiento probado. Su activaci贸n requiere las siguientes fases:
+All statistics in the initial dashboard explicitly show zero real activity. Administrative writes are not exposed before authentication and tenant authorization are implemented.
 
-1. Conectar Neon PostgreSQL y definir migraciones multi-tenant.
-2. Implementar sesiones, verificaci贸n de identidad, RBAC y superadmin.
-3. Crear una b贸veda segura para las claves API BYO con cifrado y rotaci贸n.
-4. Implementar el AI gateway autorizado, medici贸n y reserva at贸mica de cuota.
-5. Implementar panel institucional, chat privado, facturaci贸n Stripe, dominios y auditor铆a.
-6. Pruebas funcionales, de concurrencia, seguridad, aislamiento y recuperaci贸n.
+## Architecture
 
-## BYO y l铆mites del modelo
+See docs/ARCHITECTURE.md. The institutional customer owns and manages authorized provider connections; GALEEN only manages platform access and later metering, policies, and billing for the SaaS itself.
 
-Cada instituci贸n gestiona sus propias conexiones. 脷nicamente se deben integrar API y servicios cuyo contrato autorice el uso institucional previsto; no presupone que la suscripci贸n personal de ChatGPT/Claude sea redistribuible.
+## Local
 
-## Arquitectura objetivo
+Install with npm install, then npm run dev. Set secrets in Vercel's encrypted environment management. Never commit credentials.
 
-- Next.js / TypeScript alojado en Vercel
-- Neon Postg痘玘
+## Deployment
+
+Connected repository: Alianza-Indigo/Galeen (main). Vercel project: galeen.
