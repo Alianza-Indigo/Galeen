@@ -29,7 +29,7 @@ export default function Manage(){
  const val=(f:FormData,k:string)=>String(f.get(k)||"").trim();
  const n=(x:any)=>Number(x||0);
  return <main className="mg">
-  <header><div><a href="/">← GALEEN</a><p className="eyebrow">SUPERADMIN</p><h1>Administración institucional</h1></div><button onClick={()=>load()}>Actualizar</button></header>
+  <header><div><a href="/admin">← GALEEN</a><p className="eyebrow">SUPERADMIN</p><h1>Administración institucional</h1></div><button onClick={()=>load()}>Actualizar</button></header>
   {error&&<div className="alert bad" role="alert">{error}</div>}{notice&&<div className="alert good">{notice}</div>}
   <div className="columns"><aside><h2>Instituciones ({items.length})</h2>{items.map(o=><button key={o.id} className={selected===o.id?"active":""} onClick={()=>{setSelected(o.id);setTab("general");setInvite("")}}><b>{o.name}</b><small>{o.slug} · {o.status}</small></button>)}
     <button className="primary" onClick={()=>{setSelected("");setTab("general")}}>+ Nueva institución</button></aside>

@@ -24,7 +24,7 @@ export default function Login() {
         setError(result.error ?? "No fue posible acceder");
         return;
       }
-      window.location.assign("/");
+      window.location.assign("/admin");
     } catch {
       setError("No fue posible conectar con el servidor");
     } finally {

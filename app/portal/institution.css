@@ -1,0 +1,33 @@
+.ip-shell{min-height:100vh;background:#f7f8fb;color:#182a41;font-family:Inter,ui-sans-serif,system-ui,sans-serif;display:grid;grid-template-columns:250px minmax(0,1fr)}
+.ip-shell button{cursor:pointer}.ip-shell button:disabled{opacity:.5;cursor:not-allowed}.ip-sidebar{background:#142137;color:white;padding:29px 18px;display:flex;flex-direction:column;min-height:100vh}
+.ip-logo{font-size:29px;color:white;font-weight:850;letter-spacing:-1px;text-decoration:none;padding:0 10px}.ip-logo span{color:#d3aa75}
+.ip-workspace{background:#21344f;padding:14px;border-radius:10px;margin:31px 0 23px;display:grid;gap:8px}.ip-workspace label{font-size:10px;color:#8499b3;letter-spacing:1.4px;font-weight:800}
+.ip-workspace select{color:#fff;border:0;background:#21344f;font-weight:750;min-width:0;width:100%;font-size:13px;cursor:pointer}.ip-workspace option{background:#21344f}
+.ip-workspace small{font-size:11px;color:#9fadc1}
+.ip-sidebar nav{display:grid;gap:5px}.ip-sidebar nav button{border:0;color:#a9b9cd;background:transparent;padding:12px;border-radius:8px;display:flex;gap:14px;align-items:center;text-align:left;font-size:13px;font-weight:650}
+.ip-sidebar nav button span{font-size:18px;width:20px}.ip-sidebar nav button.active,.ip-sidebar nav button:hover{background:#2a3d58;color:#fff}
+.ip-profile{margin-top:auto;border-top:1px solid #32435a;padding:18px 4px 0;display:flex;gap:11px;align-items:center;min-width:0}.ip-initial{background:#d7b58b;color:#21344a;border-radius:50%;height:35px;width:35px;flex:none;display:grid;place-items:center;font-weight:850}
+.ip-profile>div:last-child{min-width:0}.ip-profile b,.ip-profile small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}.ip-profile small{color:#90a2b9;margin-top:4px}
+.ip-main{min-width:0}.ip-top{height:72px;border-bottom:1px solid #e4e9f0;background:white;display:flex;justify-content:space-between;align-items:center;gap:15px;padding:0 36px;font-size:12px;color:#5d7086}
+.ip-top b{color:#1e3450}.ip-top>div{display:flex;gap:8px}.ip-top button,.ip-invite button,.ip-member button{background:white;border:1px solid #d5dde7;border-radius:8px;padding:8px 12px;font-size:12px;color:#43566e;font-weight:700}
+.ip-content{max-width:1350px;margin:0 auto;padding:40px 34px}.ip-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:29px}
+.ip-heading p{font-size:10px;letter-spacing:1.7px;color:#b18b58;font-weight:800;margin:0}.ip-heading h1{font-size:30px;letter-spacing:-.9px;margin:12px 0 6px}.ip-heading span{font-size:12px;color:#91a0af}
+.ip-plan{border:1px solid #e5dac6;background:#fffcf5;color:#937348;padding:8px 13px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.ip-feedback{padding:13px 15px;border-radius:9px;margin-bottom:17px;font-size:12px}.ip-error{background:#fff0ed;color:#9c4237}.ip-success{background:#e8f6ee;color:#35784b}
+.ip-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:19px}.ip-stats article,.ip-card{background:white;border:1px solid #e5eaf0;border-radius:13px;padding:22px}
+.ip-stats article span,.ip-stats article strong{display:block}.ip-stats article span{font-size:11px;color:#8593a3;font-weight:700}.ip-stats article strong{font-size:31px;margin-top:17px;letter-spacing:-.5px}
+.ip-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:19px}.ip-card{margin-bottom:20px}.ip-card h2{font-size:17px;margin:0 0 21px;letter-spacing:-.2px}.ip-card h2 span{font-size:11px;color:#96a4b3;margin-left:8px}
+.ip-feature{width:100%;border:0;border-top:1px solid #e9edf2;background:transparent;display:flex;gap:13px;align-items:center;padding:17px 0;text-align:left;color:#273b54;font-size:13px}
+.ip-feature>span{background:#eef2f6;border-radius:9px;height:36px;width:36px;display:grid;place-items:center;color:#b99464;flex:none;font-size:20px}
+.ip-feature>div{flex:1}.ip-feature b,.ip-feature small{display:block}.ip-feature small{color:#9ba6b4;font-size:11px;margin-top:5px}
+.ip-plan-detail{display:flex;justify-content:space-between;gap:15px;padding:15px 0;border-top:1px solid #edf0f4;font-size:12px}.ip-plan-detail span{color:#8290a2}.ip-plan-detail b{max-width:55%;text-align:right}
+.ip-member,.ip-invite{display:flex;align-items:center;gap:12px;padding:13px 0;border-top:1px solid #edf0f4;min-width:0}.ip-member>div,.ip-invite>div{flex:1;min-width:140px}.ip-member b,.ip-member small,.ip-invite b,.ip-invite small{display:block;font-size:12px;overflow-wrap:anywhere}.ip-member small,.ip-invite small{color:#96a3b4;margin-top:5px;font-size:11px}
+.ip-member select,.ip-form select,.ip-form input{border:1px solid #ccd7e2;background:white;color:#1d3049;border-radius:8px;padding:10px;font:inherit;font-size:12px;min-width:0}
+.ip-member select{max-width:145px}.ip-member button,.ip-invite button{white-space:nowrap}.ip-invite>span{font-size:11px;color:#8797a8}
+.ip-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}.ip-form label{display:grid;gap:8px;font-size:12px;color:#587086;font-weight:700}.ip-form input,.ip-form select{width:100%}
+.ip-form label.ip-full{grid-column:1/-1}.ip-primary{background:#192d46;color:#fff;border:0;border-radius:9px;padding:12px 18px;font-size:12px;font-weight:800;justify-self:start;grid-column:1/-1}
+.ip-link{margin-top:18px;background:#f2f6f1;border-radius:10px;padding:14px;display:grid;gap:9px;overflow-wrap:anywhere;font-size:12px}.ip-link button{justify-self:start;border:1px solid #ccd8d2;border-radius:8px;background:white;padding:9px 13px;font-size:12px}
+.ip-empty{text-align:center;padding:40px 12px;color:#9aa7b7;font-size:12px}.ip-empty-shell{min-height:100vh;background:#f7f8fb}.ip-empty-shell header{background:white;display:flex;align-items:center;justify-content:space-between;padding:25px 40px}.ip-empty-shell header a{text-decoration:none;font-size:24px;font-weight:800;color:#172b45}.ip-empty-shell main{padding:45px;max-width:1000px;margin:auto}
+@media(max-width:1100px){.ip-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.ip-grid{grid-template-columns:1fr}}
+@media(max-width:850px){.ip-shell{grid-template-columns:1fr}.ip-sidebar{min-height:0;padding:18px}.ip-logo{padding:0}.ip-workspace{margin:16px 0}.ip-sidebar nav{display:flex;overflow-x:auto}.ip-sidebar nav button{white-space:nowrap}.ip-profile{display:none}.ip-content{padding:25px 17px}.ip-top{padding:0 18px}.ip-member{flex-wrap:wrap}.ip-stats{gap:10px}}
+@media(max-width:480px){.ip-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.ip-stats article{padding:15px}.ip-form{grid-template-columns:1fr}.ip-heading h1{font-size:24px}.ip-plan{font-size:10px}.ip-top{height:60px}}
