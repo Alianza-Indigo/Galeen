@@ -16,6 +16,15 @@ export async function within<T>(req:NextRequest,orgValue:unknown,allowed:readonl
   return run({db,orgId,userId,role});
  });
 }
+export const institutionalRoles: readonly Role[]=["owner","admin","manager","member","auditor"];
+export const rolesManageSettings: readonly Role[]=["owner","admin"];
+export const rolesManageMembers: readonly Role[]=["owner","admin","manager"];
+export async function withInstitution<T>(
+ req:NextRequest,orgValue:unknown,allowed:readonly Role[],
+ run:(context:{client:PoolClient;db:PoolClient;orgId:string;userId:string;role:Role})=>Promise<T>
+):Promise<T>{
+ return within(req,orgValue,allowed,ctx=>run({...ctx,client:ctx.db}));
+}
 export const allRoles:Role[]=["owner","admin","manager","member","auditor"];
 export const managers:Role[]=["owner","admin","manager"];
 export const admins:Role[]=["owner","admin"];
