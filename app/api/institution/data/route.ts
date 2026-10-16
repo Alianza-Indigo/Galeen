@@ -13,7 +13,7 @@ export async function GET(req:NextRequest){
  privileged?db.query("SELECT id,email,role,expires_at,revoked_at,accepted_at FROM organization_invitations WHERE organization_id=$1 ORDER BY created_at DESC LIMIT 100",[orgId]):Promise.resolve({rows:[]}),
  role!=="member"?db.query("SELECT id,user_id,period,max_requests,max_micro_usd,max_effective_tokens,enabled FROM usage_policies WHERE organization_id=$1 ORDER BY id DESC LIMIT 100",[orgId]):Promise.resolve({rows:[]}),
  ["owner","admin","auditor"].includes(role)?db.query("SELECT action,entity_type,created_at FROM audit_events WHERE organization_id=$1 ORDER BY id DESC LIMIT 100",[orgId]):Promise.resolve({rows:[]}),
- role!=="member"?db.query("SELECT id,provider,label,kind,enabled FROM provider_connections WHERE organization_id=$1 ORDER BY created_at DESC LIMIT 100",[orgId]):Promise.resolve({rows:[]})
+ role!=="member"?db.query("SELECT id,provider,label,kind,enabled,health_status,credential_hint FROM provider_connections WHERE organization_id=$1 ORDER BY created_at DESC LIMIT 100",[orgId]):Promise.resolve({rows:[]})
  ]);
  return {organization:org.rows[0],statistics:statistics.rows[0],members:members.rows,invitations:invitations.rows,policies:policies.rows,audit:audit.rows,connections:connections.rows,role,userId};
  });

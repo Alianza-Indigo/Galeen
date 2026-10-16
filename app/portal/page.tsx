@@ -56,7 +56,7 @@ export default function Portal(){
       <label>Nombre corto<input name="name" defaultValue={org.branding?.shortName||org.name} required/></label><label>Color<input type="color" name="color" defaultValue={org.branding?.primaryColor||"#172b44"}/></label>
       <label>Logotipo (URL HTTPS)<input type="url" name="logo" defaultValue={org.branding?.logoUrl||""}/></label><button className="ip-primary" disabled={loading}>Guardar identidad</button></form></section>}
     {org&&tab==="audit"&&audit&&<section className="ip-card"><h2>Actividad</h2>{data.audit?.map((a:R,i:number)=><div className="ip-row" key={i}><div className="ip-person"><b>{a.action}</b><small>{a.entity_type}</small></div><small>{new Date(a.created_at).toLocaleString("es-MX")}</small></div>)}</section>}
-    {org&&tab==="connections"&&<section className="ip-card"><h2>Conexiones</h2>{data.connections?.map((c:R)=><div className="ip-row" key={c.id}><div className="ip-person"><b>{c.label}</b><small>{c.provider}</small></div><span>{c.enabled?"Activa":"Inactiva"}</span></div>)}{!data.connections?.length&&<p>Sin conexiones.</p>}</section>}
+    {org&&tab==="connections"&&<Connections organizationId={id} role={role} items={data.connections||[]} onRefresh={()=>reload(id)}/>}
    </div>
   </main>
  </div>;
