@@ -26,7 +26,7 @@ export default function Portal(){
   <nav>{tabs.map(([key,label])=><button key={key} className={tab===key?"active":""} onClick={()=>setTab(key)}>{label}</button>)}</nav>
   <div className="ip-bottom"><small>{profile?.user?.email}</small><button onClick={logout}>Salir ↗</button></div></aside>
   <main className="ip-main"><header className="ip-bar"><strong>GALEEN / {org?.name||"Institución"}</strong><div>
-   {profile?.institutions?.length>1&&<select value={id} onChange={e=>setId(e.target.value)} aria-label="Institución">{profile.institutions.map((x:R)=><option key={x.id} value={x.id}>{x.name}</option>)}</select>}
+   {profile?.institutions?.length>1&&<select value={id} onChange={e=>setId(e.target.value)} aria-label="Institución">{(profile?.institutions||[]).map((x:R)=><option key={x.id} value={x.id}>{x.name}</option>)}</select>}
    <button onClick={()=>void reload()} disabled={loading}>Actualizar</button></div></header>
    <div className="ip-content"><small className="ip-over">PANEL INSTITUCIONAL</small><h1>{tabs.find(([k])=>k===tab)?.[1]}</h1>
     {error&&<div className="ip-error" role="alert">{error}</div>}{notice&&<div className="ip-ok">{notice}</div>}
