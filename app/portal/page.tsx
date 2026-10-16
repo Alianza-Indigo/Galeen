@@ -1,6 +1,8 @@
 "use client";
 import {useEffect,useState,type FormEvent} from "react";
 import "./portal.css";
+import Connections from "./Connections";
+import ResourceConsole from "./ResourceConsole";
 type R=Record<string,any>;
 const names:Record<string,string>={owner:"Propietario",admin:"Administrador",manager:"Gestor",member:"Miembro",auditor:"Auditor"};
 const management=["owner","admin","manager"];
@@ -19,7 +21,7 @@ export default function Portal(){
  async function logout(){await fetch("/api/member/logout",{method:"POST"});location.assign("/")}
  const org=data?.organization,role=String(data?.role||"");
  const manage=management.includes(role),brand=["owner","admin"].includes(role),audit=brand||role==="auditor";
- const tabs=[["overview","Resumen"],...(manage?[["members","Usuarios"],["quotas","Cuotas"]]:[]),...(brand?[["brand","Identidad"]]:[]),...(audit?[["audit","Auditoría"]]:[]),["connections","Conexiones"]];
+ const tabs=[["overview","Resumen"],...(manage?[["members","Usuarios"],["quotas","Cuotas"]]:[]),...(brand?[["brand","Identidad"]]:[]),...(audit?[["audit","Auditoría"]]:[]),["connections","Conexiones"],["subscriptions","Suscripciones"],["shared-accounts","Cuentas compartidas"]];
  const roleList=role==="manager"?["member","auditor"]:role==="admin"?["admin","manager","member","auditor"]:["admin","manager","member","auditor"];
  return <div className="ip-shell">
   <aside className="ip-side"><a href="/" className="ip-logo">galeen.</a><div className="ip-work"><b>{org?.branding?.shortName||org?.name||"Mi institución"}</b><small>{names[role]||"Acceso institucional"}</small></div>
@@ -56,6 +58,8 @@ export default function Portal(){
       <label>Nombre corto<input name="name" defaultValue={org.branding?.shortName||org.name} required/></label><label>Color<input type="color" name="color" defaultValue={org.branding?.primaryColor||"#172b44"}/></label>
       <label>Logotipo (URL HTTPS)<input type="url" name="logo" defaultValue={org.branding?.logoUrl||""}/></label><button className="ip-primary" disabled={loading}>Guardar identidad</button></form></section>}
     {org&&tab==="audit"&&audit&&<section className="ip-card"><h2>Actividad</h2>{data.audit?.map((a:R,i:number)=><div className="ip-row" key={i}><div className="ip-person"><b>{a.action}</b><small>{a.entity_type}</small></div><small>{new Date(a.created_at).toLocaleString("es-MX")}</small></div>)}</section>}
+    {org&&tab==="subscriptions"&&<ResourceConsole organizationId={id} role={role} kind="subscriptions"/>}
+    {org&&tab==="shared-accounts"&&<ResourceConsole organizationId={id} role={role} kind="shared-accounts"/>}
     {org&&tab==="connections"&&<Connections organizationId={id} role={role} items={data.connections||[]} onRefresh={()=>reload(id)}/>}
    </div>
   </main>
