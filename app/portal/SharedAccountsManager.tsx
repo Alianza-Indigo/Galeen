@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import "./shared-accounts.css";
 import "./pool-broker.css";
 import PoolBrokerPanel from "./PoolBrokerPanel";
+import LocalBrokerPanel from "./LocalBrokerPanel";
 
 type Resource={
   id:string;provider:string;label:string;account_alias:string;
@@ -142,6 +143,7 @@ export default function SharedAccountsManager({organizationId,role,userId}:Props
             provider={resource.provider} status={resource.connection_status}
             hint={resource.pool_key_hint} model={resource.pool_model} canManage={canManage}
             hasTurn={Boolean(myTurn)} onChange={load}/>
+          <LocalBrokerPanel organizationId={organizationId} resourceId={resource.id} provider={resource.provider} canManage={canManage} hasTurn={Boolean(myTurn)}/>
           {canManage&&<div className="sa-controls">
             <button disabled={busy} onClick={()=>setEditing(editing===resource.id?"":resource.id)}>Configurar</button>
           </div>}
