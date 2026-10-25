@@ -40,7 +40,7 @@ export async function POST(req:NextRequest){
     await client.query(
       "UPDATE shared_account_resources SET pool_key_encrypted=$3,pool_key_nonce=$4,pool_key_version=$5,"+
       "pool_key_hint=$6,pool_model=$7,pool_verified_at=NULL,connection_status='pending_authorized_connector',"+
-      "status='paused',updated_at=now() WHERE organization_id=$1 AND id=$2",
+      "updated_at=now() WHERE organization_id=$1 AND id=$2",
       [orgId,id,encrypted.encrypted,encrypted.nonce,encrypted.version,encrypted.hint,model]
     );
     await audit(client,orgId,"shared_account.broker_saved","shared_account",id,{},userId);
@@ -76,7 +76,7 @@ export async function POST(req:NextRequest){
    const updated=await withInstitution(req,orgId,administrators,async({client,orgId,userId})=>{
     const row=await client.query(
       "UPDATE shared_account_resources SET connection_status=$4,pool_verified_at=CASE WHEN $4='connected' "+
-      "THEN now() ELSE NULL END, status=CASE WHEN $4='connected' THEN status ELSE 'paused' END,updated_at=now() "+
+      "THEN now() ELSE NULL END,updated_at=now() "+
       "WHERE organization_id=$1 AND id=$2 AND pool_key_encrypted=$3 RETURNING id",
       [orgId,id,account.pool_key_encrypted,status]
     );
@@ -91,7 +91,7 @@ export async function POST(req:NextRequest){
   // Reservation is required: this endpoint does not hand provider secrets to clients.
   const execution=await withInstitution(req,orgId,allRoles,async({client,orgId,userId})=>{
    const account=await getAccount(client,orgId,id,true);
-   if(account.status!=="active"||account.connection_status!=="connected"||
+   if(account.status!=="active"||
      !account.pool_key_encrypted||!account.pool_key_nonce||!account.pool_key_version||!account.pool_model)
      throw new ApiError(409,"Esta cuenta no tiene conexión activa al motor.");
    if(!["openai","anthropic"].includes(account.provider))
@@ -119,10 +119,6 @@ export async function POST(req:NextRequest){
      "WHERE organization_id=$1 AND started_at>=date_trunc('month',now()) AND state IN ('running','settled')",[orgId]);
    if(used.rows[0].count>=Number(quota.rows[0].max_monthly_requests))
      throw new ApiError(429,"Límite mensual institucional alcanzado.");
-   const recent=await client.query<{count:number}>(
-     "SELECT count(*)::int AS count FROM shared_account_executions "+
-     "WHERE organization_id=$1 AND user_id=$2 AND started_at>now()-interval '1 minute'",[orgId,userId]);
-   if(recent.rows[0].count>=8)throw new ApiError(429,"Demasiadas solicitudes. Prueba en un minuto.");
    const result=await client.query<{id:string}>(
      "INSERT INTO shared_account_executions(organization_id,resource_id,reservation_id,user_id,provider,model_id,state,input_characters) "+
      "VALUES($1,$2,$3,$4,$5,$6,'running',$7) RETURNING id",
