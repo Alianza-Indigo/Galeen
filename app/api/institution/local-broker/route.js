@@ -9,11 +9,9 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 const managers = ["owner","admin"];
-const enabled = () => process.env.GALEEN_LOCAL_BROKER_ENABLED === "true";
 const sha = value => createHash("sha256").update(value).digest("hex");
 const secret = () => randomBytes(32).toString("base64url");
 const respond = (body,status=200) => NextResponse.json(body,{status,headers:{"Cache-Control":"no-store"}});
-function requireEnabled(){if(!enabled())throw new ApiError(503,"El motor local no está habilitado.");}
 function validModel(value){
  if(value===undefined||value===null||value==="")return null;
  if(typeof value!=="string"||!/^[A-Za-z0-9][A-Za-z0-9._:/-]{1,99}$/.test(value))
@@ -106,7 +104,6 @@ async function agentAction(req,body){
 export async function GET(req){
  try{
   const org=uuid(req.nextUrl.searchParams.get("organizationId")),id=uuid(req.nextUrl.searchParams.get("resourceId"));
-  if(!enabled())return respond({enabled:false,agent:null,jobs:[]});
   return respond(await withInstitution(req,org,institutionalRoles,async({client,userId,role,orgId})=>{
    await ownerResource(client,orgId,id);
    const agent=await client.query("SELECT agent_name,last_seen_at,revoked_at,created_at FROM galeen_local_agents WHERE organization_id=$1 AND resource_id=$2",[orgId,id]);
@@ -122,7 +119,7 @@ export async function POST(req){
   const body=await requestJson(req,75000);
   if(typeof body.action!=="string")throw new ApiError(400,"Acción requerida.");
   if(body.action.startsWith("agent."))return await agentAction(req,body);
-  requireSameOrigin(req);requireEnabled();
+  requireSameOrigin(req);
   const org=uuid(body.organizationId),id=uuid(body.resourceId);
   if(body.action==="pair")return respond(await withInstitution(req,org,managers,async({client,orgId,userId})=>{
    await ownerResource(client,orgId,id,true);
