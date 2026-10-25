@@ -53,7 +53,7 @@ export default function PoolBrokerPanel({organizationId,resourceId,provider,mode
     }}>Desconectar</button>
    </div>
   </>}
-  {hasTurn&&status==="connected"&&<form className="sa-engine-chat"
+  {hasTurn&&hint&&<form className="sa-engine-chat"
    onSubmit={(e:FormEvent<HTMLFormElement>)=>{e.preventDefault();if(prompt.trim())void act("infer",{prompt:prompt.trim()})}}>
     <label>Mensaje<textarea value={prompt} onChange={e=>setPrompt(e.target.value)}
       maxLength={12000} rows={3} required placeholder="Escribe tu mensaje..."/></label>
