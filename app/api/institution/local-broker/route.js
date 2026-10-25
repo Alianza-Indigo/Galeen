@@ -31,9 +31,9 @@ async function authenticatedAgent(req,body,callback){
  const org=uuid(m[1]),resource=uuid(m[2]);
  return transaction(async client=>{
    await client.query("SELECT set_config('galeen.tenant_id',$1,true)",[org]);
-   const row=await client.query("SELECT a.resource_id,r.provider,r.status,r.max_concurrent FROM galeen_local_agents a JOIN shared_account_resources r ON r.organization_id=a.organization_id AND r.id=a.resource_id WHERE a.organization_id=$1 AND a.resource_id=$2 AND a.token_digest=$3 AND a.revoked_at IS NULL",[org,resource,sha(token)]);
+   const row=await client.query("SELECT a.resource_id,a.agent_kind,r.provider,r.status,r.max_concurrent FROM galeen_local_agents a JOIN shared_account_resources r ON r.organization_id=a.organization_id AND r.id=a.resource_id WHERE a.organization_id=$1 AND a.resource_id=$2 AND a.token_digest=$3 AND a.revoked_at IS NULL",[org,resource,sha(token)]);
    if(!row.rows[0])throw new ApiError(401,"Agente revocado o inválido.");
-   return callback(client,{org,resource,provider:row.rows[0].provider,status:row.rows[0].status,capacity:row.rows[0].max_concurrent},body);
+   return callback(client,{org,resource,provider:row.rows[0].provider,kind:row.rows[0].agent_kind,status:row.rows[0].status,capacity:row.rows[0].max_concurrent},body);
  });
 }
 async function agentAction(req,body){
