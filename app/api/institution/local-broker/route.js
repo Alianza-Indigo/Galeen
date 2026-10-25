@@ -45,14 +45,15 @@ async function agentAction(req,body){
   const org=uuid(m[1]),resource=uuid(m[2]),name=stringField(body.name,"Nombre del agente",1,100);
   const kind=body.kind==="browser"?"browser":"cli";
   const newToken="gba."+org+"."+resource+"."+secret();
-  await transaction(async client=>{
+  const provider=await transaction(async client=>{
    await client.query("SELECT set_config('galeen.tenant_id',$1,true)",[org]);
    const pair=await client.query("DELETE FROM galeen_local_pairings WHERE organization_id=$1 AND resource_id=$2 AND code_digest=$3 AND expires_at>now() RETURNING resource_id",[org,resource,sha(code)]);
    if(!pair.rows.length)throw new ApiError(401,"Código vencido o utilizado.");
-   await ownerResource(client,org,resource,true);
+   const account=await ownerResource(client,org,resource,true);
    await client.query("INSERT INTO galeen_local_agents(organization_id,resource_id,token_digest,agent_name,agent_kind) VALUES($1,$2,$3,$4,$5) ON CONFLICT(organization_id,resource_id) DO UPDATE SET token_digest=EXCLUDED.token_digest,agent_name=EXCLUDED.agent_name,agent_kind=EXCLUDED.agent_kind,revoked_at=NULL,last_seen_at=NULL,created_at=now()",[org,resource,sha(newToken),name,kind]);
+   return account.provider;
   });
-  return respond({ok:true,token:newToken,organizationId:org,resourceId:resource,kind});
+  return respond({ok:true,token:newToken,organizationId:org,resourceId:resource,kind,provider});
  }
  return respond(await authenticatedAgent(req,body,async(client,agent,data)=>{
   const p=[agent.org,agent.resource];
