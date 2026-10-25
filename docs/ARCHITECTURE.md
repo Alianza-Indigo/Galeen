@@ -30,7 +30,7 @@ La consola Next.js está desplegada. Este repositorio incluye un esquema de base
 5. La tabla de credenciales requiere cifrado autenticado, nonce único y versionado de claves; la clave maestra se guarda fuera de Neon.
 6. Aplicar reservas transaccionales de cuota con bloqueos/idempotencia, conciliando resultados, fallas y vencimientos. Los límites no están implementados todavía.
 7. Ninguna ruta administrativa debe activarse hasta contar con pruebas de aislamiento multi-tenant y privilegios.
-8. No habilitar conexiones de cuentas o suscripciones personales sin un mecanismo y autorización adecuados del proveedor.
+8. La institución configura los recursos de IA que aporta y asume la responsabilidad por su utilización. GALEEN comprueba la identidad, los permisos y las asignaciones dentro de la plataforma, sin exigir una aprobación externa como condición de activación.
 
 ## Neon
 
