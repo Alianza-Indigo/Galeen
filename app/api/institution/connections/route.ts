@@ -25,11 +25,6 @@ async function load(client:import("pg").PoolClient,org:string,id:string,lock=fal
  if(!r.rows.length) throw new ApiError(404,"Conexión no encontrada.");
  return r.rows[0];
 }
-async function permit(client:import("pg").PoolClient,org:string,provider:ProviderName) {
- const r=await client.query<{allowed_providers:string[]}>(
-  "SELECT allowed_providers FROM organization_entitlements WHERE organization_id=$1",[org]);
- if(!r.rows[0]?.allowed_providers.includes(provider))throw new ApiError(403,"Proveedor no permitido por el plan.");
-}
 function secret(value:unknown):string{
  if(typeof value!=="string")throw new ApiError(400,"Introduce la credencial.");
  return value;
@@ -45,9 +40,6 @@ export async function POST(req:NextRequest){
    return reply(await withInstitution(req,orgId,rolesManageSettings,async({client,orgId,userId})=>{
     const provider=option(body.provider,providers,"Proveedor");
     const label=stringField(body.label,"Nombre",2,100);
-    await permit(client,orgId,provider);
-    const num=await client.query<{n:number}>("SELECT count(*)::int AS n FROM provider_connections WHERE organization_id=$1",[orgId]);
-    if(num.rows[0].n>=50)throw new ApiError(409,"Se alcanzó el máximo de conexiones.");
     const id=randomUUID();
     const secured=encryptCredential(orgId,id,secret(body.credential));
     await client.query(
@@ -64,7 +56,6 @@ export async function POST(req:NextRequest){
     const record=await load(client,orgId,connectionId);
     if(record.last_checked_at && Date.now()-new Date(record.last_checked_at).getTime()<20000)
      throw new ApiError(429,"Espera unos segundos antes de probar nuevamente.");
-    await permit(client,orgId,record.provider);
     return {provider:record.provider, encrypted:record.encrypted_credential,nonce:record.nonce,version:record.encryption_key_version};
    });
    const credential=decryptCredential(orgId,connectionId,state.encrypted,state.nonce,state.version);
@@ -72,7 +63,7 @@ export async function POST(req:NextRequest){
    const didSave=await withInstitution(req,orgId,rolesManageSettings,async({client,orgId,userId})=>{
     const res=await client.query(
      "UPDATE provider_connections SET health_status=$4,last_checked_at=now(),updated_at=now()," +
-     "enabled=CASE WHEN $4='healthy' THEN enabled ELSE false END " +
+     "enabled=enabled " +
      "WHERE organization_id=$1 AND id=$2 AND encrypted_credential=$3 RETURNING id",
      [orgId,connectionId,state.encrypted,health]);
     if(res.rowCount)await audit(client,orgId,"connection.tested","provider_connection",connectionId,{status:health},userId);
@@ -94,12 +85,6 @@ export async function POST(req:NextRequest){
     await audit(client,orgId,"connection.rotated","provider_connection",connectionId,{},userId);
    }else if(action==="toggle"){
     if(typeof body.enabled!=="boolean")throw new ApiError(400,"Estado inválido.");
-    if(body.enabled){
-     await permit(client,orgId,record.provider);
-     if(record.health_status!=="healthy"||!record.last_checked_at||
-      Date.now()-new Date(record.last_checked_at).getTime()>86400000)
-      throw new ApiError(409,"Prueba la conexión antes de activarla.");
-    }
     await client.query("UPDATE provider_connections SET enabled=$3,updated_at=now() WHERE organization_id=$1 AND id=$2",
       [orgId,connectionId,body.enabled]);
     await audit(client,orgId,body.enabled?"connection.enabled":"connection.disabled","provider_connection",connectionId,{},userId);
