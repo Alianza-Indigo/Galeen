@@ -143,9 +143,7 @@ export async function POST(req){
    if(!reservation.rows[0])throw new ApiError(403,"Necesitas una asignación y un turno vigente.");
    const agent=await client.query("SELECT 1 FROM galeen_local_agents WHERE organization_id=$1 AND resource_id=$2 AND revoked_at IS NULL AND last_seen_at>now()-interval '3 minutes'",[orgId,id]);
    if(!agent.rows.length)throw new ApiError(409,"El agente local no está conectado.");
-   const backlog=await client.query("SELECT count(*) FILTER(WHERE user_id=$3)::int AS mine,count(*)::int AS total FROM galeen_local_jobs WHERE organization_id=$1 AND resource_id=$2 AND state IN ('queued','running')",[orgId,id,userId]);
-   if(backlog.rows[0].mine>=10||backlog.rows[0].total>=250)throw new ApiError(429,"Cola llena.");
-   const created=await client.query("INSERT INTO galeen_local_jobs(organization_id,resource_id,reservation_id,user_id,model_id,prompt) VALUES($1,$2,$3,$4,$5,$6) RETURNING id",[orgId,id,reservation.rows[0].id,userId,model,prompt]);
+   const created=await client.query("INSERT INTO galeen_local_jobs(organization_id,resource_id,reservation_id,user_id,provider,model_id,prompt) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id",[orgId,id,reservation.rows[0].id,userId,account.provider,model,prompt]);
    await audit(client,orgId,"local_broker.job_queued","local_job",created.rows[0].id,{resourceId:id},userId);
    return {ok:true,jobId:created.rows[0].id};
   }),201);
