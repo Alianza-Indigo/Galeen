@@ -53,7 +53,7 @@ export async function POST(req:NextRequest){
     await client.query(
       "UPDATE shared_account_resources SET pool_key_encrypted=NULL,pool_key_nonce=NULL,pool_key_version=NULL,"+
       "pool_key_hint=NULL,pool_model=NULL,pool_verified_at=NULL,connection_status='not_connected',"+
-      "status='paused',updated_at=now() WHERE organization_id=$1 AND id=$2",[orgId,id]);
+      "updated_at=now() WHERE organization_id=$1 AND id=$2",[orgId,id]);
     await client.query("UPDATE shared_account_reservations SET status='released',ended_at=now() "+
       "WHERE organization_id=$1 AND resource_id=$2 AND status='active'",[orgId,id]);
     await audit(client,orgId,"shared_account.broker_disconnected","shared_account",id,{},userId);
