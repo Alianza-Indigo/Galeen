@@ -7,7 +7,7 @@ SaaS multiinstitucional para administrar el acceso de organizaciones a herramien
 1. **Cuentas y suscripciones**. Tres opciones en el panel de Recursos de IA: (a) cuentas personales compartidas, con asignaciones, disponibilidad, turnos y control concurrente dentro de GALEEN; (b) licencias institucionales, con administración de cupos; (c) conexiones API. El titular aporta la capacidad; la autenticación externa y el uso real de una cuenta personal dependen de un broker o conector compatible. GALEEN no recibe contraseñas ni cookies de dichas cuentas.
 2. **API institucional**. La organización proporciona sus propias claves API oficiales. GALEEN las cifra en el servidor, permite probarlas, rotarlas, activarlas o desactivarlas. No se ha habilitado todavía un motor de inferencia.
 
-El cliente es responsable de contratar su capacidad con el proveedor. Compartir una suscripción personal entre múltiples usuarios no se presume permitido ni técnicamente integrado.
+La institución aporta y administra sus propios recursos de IA y responde por su utilización. GALEEN ya incluye un broker local integrado que ejecuta solicitudes a través de agentes; su capacidad real con sesiones personales sigue pendiente de verificarse.
 
 ## Rutas actuales
 
@@ -28,10 +28,10 @@ La conexión de PostgreSQL y los secretos deben gestionarse como variables cifra
 
 - Administración institucional, roles, invitaciones, marca blanca y auditoría están implementados en el backend.
 - Conexiones API: almacenamiento y verificación de credenciales, pero **sin procesamiento de prompts ni consumo**.
-- Cuentas compartidas: inventario, asignación a múltiples usuarios, concurrencia, reservas temporizadas, liberación y revocación. **Todavía no hay un broker que autentique esas cuentas y envíe solicitudes reales al proveedor.**
+- Cuentas compartidas: inventario, asignación a múltiples usuarios, concurrencia, reservas temporizadas, liberación y revocación. **Existe un broker local integrado que administra trabajos y ejecuta los CLI en el equipo del titular; su funcionamiento con cuentas reales sigue pendiente de prueba.**
 - Suscripciones institucionales: inventario y asignaciones internas de cupos; no aprovisionamiento automático.
 - ElizaOS Pool: se verificó el código abierto de pool-meter, broker-proxy y codex-proxy. Su account broker central **no está publicado en ese repositorio**, por lo que falta implementar o conectar ese componente para compartir capacidad real.
-- Pendientes: integración real del broker y el motor de inferencia, pruebas end-to-end de cuentas reales y aislamiento multiinstitucional, facturación y portal de IA.
+- Pendientes: pruebas end-to-end con cuentas reales, validación de concurrencia efectiva, inferencia por API, modelos autoalojados y facturación.
 - No se debe presentar la asignación de cupos de GALEEN como una licencia confirmada por OpenAI, Anthropic, Google o Microsoft.
 
 ## Desarrollo
