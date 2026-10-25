@@ -23,7 +23,7 @@ export default function ConnectionsManager({organizationId,allowedProviders,conn
   }catch(e){setMessage(e instanceof Error?e.message:"Error de conexión");}
   finally{setBusy(false);}
  }
- const options=["openai","anthropic","google","openrouter"].filter(p=>allowedProviders.includes(p));
+ const options=["openai","anthropic","google","openrouter"];
  function create(e:FormEvent<HTMLFormElement>){e.preventDefault();void submit("create",undefined,{provider:options.includes(provider)?provider:options[0],label,credential:key});}
  return <>
   <section className="ip-card"><h2>Conexiones ({connections.length})</h2>
@@ -34,7 +34,7 @@ export default function ConnectionsManager({organizationId,allowedProviders,conn
     {c.credential_hint&&<small>Clave: {c.credential_hint}</small>}</div>
    {canManage&&<div className="ip-provider-buttons">
     <button disabled={busy} onClick={()=>void submit("test",c.id)}>Probar</button>
-    <button disabled={busy||(!c.enabled&&c.health_status!=="healthy")} onClick={()=>void submit("toggle",c.id,{enabled:!c.enabled})}>{c.enabled?"Desactivar":"Activar"}</button>
+    <button disabled={busy} onClick={()=>void submit("toggle",c.id,{enabled:!c.enabled})}>{c.enabled?"Desactivar":"Activar"}</button>
     <button disabled={busy} onClick={()=>{setEditing("rename:"+c.id);setValue(c.label)}}>Renombrar</button>
     <button disabled={busy} onClick={()=>{setEditing("rotate:"+c.id);setValue("")}}>Cambiar clave</button>
     <button disabled={busy} className="ip-provider-danger" onClick={()=>{if(confirm("¿Eliminar esta conexión?"))void submit("remove",c.id)}}>Eliminar</button>
