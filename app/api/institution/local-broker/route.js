@@ -31,9 +31,9 @@ async function authenticatedAgent(req,body,callback){
  const org=uuid(m[1]),resource=uuid(m[2]);
  return transaction(async client=>{
    await client.query("SELECT set_config('galeen.tenant_id',$1,true)",[org]);
-   const row=await client.query("SELECT a.resource_id,a.agent_kind,r.provider,r.status,r.max_concurrent FROM galeen_local_agents a JOIN shared_account_resources r ON r.organization_id=a.organization_id AND r.id=a.resource_id WHERE a.organization_id=$1 AND a.resource_id=$2 AND a.token_digest=$3 AND a.revoked_at IS NULL",[org,resource,sha(token)]);
+   const row=await client.query("SELECT a.resource_id,r.provider,r.status,r.max_concurrent FROM galeen_local_agents a JOIN shared_account_resources r ON r.organization_id=a.organization_id AND r.id=a.resource_id WHERE a.organization_id=$1 AND a.resource_id=$2 AND a.token_digest=$3 AND a.revoked_at IS NULL",[org,resource,sha(token)]);
    if(!row.rows[0])throw new ApiError(401,"Agente revocado o inválido.");
-   return callback(client,{org,resource,provider:row.rows[0].provider,kind:row.rows[0].agent_kind,status:row.rows[0].status,capacity:row.rows[0].max_concurrent},body);
+   return callback(client,{org,resource,provider:row.rows[0].provider,status:row.rows[0].status,capacity:row.rows[0].max_concurrent},body);
  });
 }
 async function agentAction(req,body){
@@ -43,17 +43,15 @@ async function agentAction(req,body){
   const m=/^gbp\.([0-9a-f-]{36})\.([0-9a-f-]{36})\.([A-Za-z0-9_-]{43})$/.exec(code);
   if(!m)throw new ApiError(401,"Código de emparejamiento inválido.");
   const org=uuid(m[1]),resource=uuid(m[2]),name=stringField(body.name,"Nombre del agente",1,100);
-  const kind=body.kind==="browser"?"browser":"cli";
   const newToken="gba."+org+"."+resource+"."+secret();
-  const provider=await transaction(async client=>{
+  await transaction(async client=>{
    await client.query("SELECT set_config('galeen.tenant_id',$1,true)",[org]);
    const pair=await client.query("DELETE FROM galeen_local_pairings WHERE organization_id=$1 AND resource_id=$2 AND code_digest=$3 AND expires_at>now() RETURNING resource_id",[org,resource,sha(code)]);
    if(!pair.rows.length)throw new ApiError(401,"Código vencido o utilizado.");
-   const account=await ownerResource(client,org,resource,true);
-   await client.query("INSERT INTO galeen_local_agents(organization_id,resource_id,token_digest,agent_name,agent_kind) VALUES($1,$2,$3,$4,$5) ON CONFLICT(organization_id,resource_id) DO UPDATE SET token_digest=EXCLUDED.token_digest,agent_name=EXCLUDED.agent_name,agent_kind=EXCLUDED.agent_kind,revoked_at=NULL,last_seen_at=NULL,created_at=now()",[org,resource,sha(newToken),name,kind]);
-   return account.provider;
+   await ownerResource(client,org,resource,true);
+   await client.query("INSERT INTO galeen_local_agents(organization_id,resource_id,token_digest,agent_name) VALUES($1,$2,$3,$4) ON CONFLICT(organization_id,resource_id) DO UPDATE SET token_digest=EXCLUDED.token_digest,agent_name=EXCLUDED.agent_name,revoked_at=NULL,last_seen_at=NULL,created_at=now()",[org,resource,sha(newToken),name]);
   });
-  return respond({ok:true,token:newToken,organizationId:org,resourceId:resource,kind,provider});
+  return respond({ok:true,token:newToken,organizationId:org,resourceId:resource});
  }
  return respond(await authenticatedAgent(req,body,async(client,agent,data)=>{
   const p=[agent.org,agent.resource];
@@ -86,7 +84,7 @@ async function agentAction(req,body){
    for(const j of picked.rows){
     const runId=randomUUID();
     await client.query("UPDATE galeen_local_jobs SET state='running',run_id=$2,attempts=attempts+1,lease_expires_at=now()+interval '180 seconds',updated_at=now() WHERE id=$1",[j.id,runId]);
-    jobs.push({jobId:j.id,runId,prompt:j.prompt,model:j.model_id,provider:agent.kind==="browser"?agent.provider:agent.provider==="openai"?"codex":"claude"});
+    jobs.push({jobId:j.id,runId,prompt:j.prompt,model:j.model_id,provider:agent.provider==="openai"?"codex":"claude"});
    }
    return {ok:true,jobs,capacity:resource.max_concurrent,running:Number(active.rows[0].n)+jobs.length};
   }
@@ -108,7 +106,7 @@ export async function GET(req){
   const org=uuid(req.nextUrl.searchParams.get("organizationId")),id=uuid(req.nextUrl.searchParams.get("resourceId"));
   return respond(await withInstitution(req,org,institutionalRoles,async({client,userId,role,orgId})=>{
    await ownerResource(client,orgId,id);
-   const agent=await client.query("SELECT agent_name,agent_kind,last_seen_at,revoked_at,created_at FROM galeen_local_agents WHERE organization_id=$1 AND resource_id=$2",[orgId,id]);
+   const agent=await client.query("SELECT agent_name,last_seen_at,revoked_at,created_at FROM galeen_local_agents WHERE organization_id=$1 AND resource_id=$2",[orgId,id]);
    const manager=managers.includes(role);
    const jobs=await client.query("SELECT id,user_id,state,result,error,created_at,finished_at FROM galeen_local_jobs WHERE organization_id=$1 AND resource_id=$2"+(manager?"":" AND user_id=$3")+" ORDER BY created_at DESC LIMIT 40",manager?[orgId,id]:[orgId,id,userId]);
    return {enabled:true,agent:agent.rows[0]||null,jobs:jobs.rows};
