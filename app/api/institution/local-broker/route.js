@@ -85,7 +85,7 @@ async function agentAction(req,body){
    for(const j of picked.rows){
     const runId=randomUUID();
     await client.query("UPDATE galeen_local_jobs SET state='running',run_id=$2,attempts=attempts+1,lease_expires_at=now()+interval '180 seconds',updated_at=now() WHERE id=$1",[j.id,runId]);
-    jobs.push({jobId:j.id,runId,prompt:j.prompt,model:j.model_id,provider:agent.provider==="openai"?"codex":"claude"});
+    jobs.push({jobId:j.id,runId,prompt:j.prompt,model:j.model_id,provider:agent.kind==="browser"?agent.provider:agent.provider==="openai"?"codex":"claude"});
    }
    return {ok:true,jobs,capacity:resource.max_concurrent,running:Number(active.rows[0].n)+jobs.length};
   }
@@ -107,7 +107,7 @@ export async function GET(req){
   const org=uuid(req.nextUrl.searchParams.get("organizationId")),id=uuid(req.nextUrl.searchParams.get("resourceId"));
   return respond(await withInstitution(req,org,institutionalRoles,async({client,userId,role,orgId})=>{
    await ownerResource(client,orgId,id);
-   const agent=await client.query("SELECT agent_name,last_seen_at,revoked_at,created_at FROM galeen_local_agents WHERE organization_id=$1 AND resource_id=$2",[orgId,id]);
+   const agent=await client.query("SELECT agent_name,agent_kind,last_seen_at,revoked_at,created_at FROM galeen_local_agents WHERE organization_id=$1 AND resource_id=$2",[orgId,id]);
    const manager=managers.includes(role);
    const jobs=await client.query("SELECT id,user_id,state,result,error,created_at,finished_at FROM galeen_local_jobs WHERE organization_id=$1 AND resource_id=$2"+(manager?"":" AND user_id=$3")+" ORDER BY created_at DESC LIMIT 40",manager?[orgId,id]:[orgId,id,userId]);
    return {enabled:true,agent:agent.rows[0]||null,jobs:jobs.rows};
