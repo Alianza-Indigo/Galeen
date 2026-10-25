@@ -37,7 +37,7 @@ async function authenticatedAgent(req,body,callback){
  });
 }
 async function agentAction(req,body){
- requireEnabled();
+
  if(body.action==="agent.pair"){
   const code=String(body.code||"");
   const m=/^gbp\.([0-9a-f-]{36})\.([0-9a-f-]{36})\.([A-Za-z0-9_-]{43})$/.exec(code);
